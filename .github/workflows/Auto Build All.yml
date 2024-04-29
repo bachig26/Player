@@ -135,7 +135,7 @@ jobs:
       - name: Build MPC-BE
         run: |
           cd C:\\repos\\MPC-BE
-          .\\build.bat Build Packages
+          .\\build.bat Build All
         shell: pwsh
         continue-on-error: true
 
