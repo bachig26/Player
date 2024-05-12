@@ -8,7 +8,7 @@ on:
         required: false
         default: 'false'
   schedule:
-    - cron: '0 */1 * * *'
+    - cron: '*/30 * * * *'
 
 jobs:
   check-updates:
@@ -122,7 +122,7 @@ jobs:
 
       - name: TimeZone
         shell: pwsh
-        run: tzutil /s "China Standard Time"
+        run: tzutil /s "W. Europe Standard Time"
 
       - name: Build VideoRenderer
         run: |
