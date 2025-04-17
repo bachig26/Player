@@ -193,3 +193,4 @@ jobs:
           delete_workflows: true
           workflows_keep_day: 66
           gh_token: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
