@@ -79,29 +79,29 @@ jobs:
       - name: Clone MPC-BE repository
         shell: pwsh
         run: |
-          git clone --recursive https://github.com/Aleksoid1978/MPC-BE.git D:\\MPC-BE
+          git clone --recursive https://github.com/Aleksoid1978/MPC-BE.git C:\\repo\\MPC-BE
 
       - name: Select Windows SDK 10.0.22621.0 - MPC-BE
         shell: pwsh
         run: |
-          cd D:\\MPC-BE
+          cd C:\\repo\\MPC-BE
           (Get-Content .\\src\\platform.props) | ForEach-Object { $_ -replace ">10.0<", ">10.0.22621.0<" } | Set-Content .\\src\\platform.props
 
       - name: Clone VideoRenderer repository
         shell: pwsh
         run: |
-          git clone --recursive https://github.com/Aleksoid1978/VideoRenderer.git D:\\VideoRenderer
+          git clone --recursive https://github.com/Aleksoid1978/VideoRenderer.git C:\\repo\\VideoRenderer
 
       - name: Select Windows SDK 10.0.22621.0 - VideoRenderer
         shell: pwsh
         run: |
-          cd D:\\VideoRenderer
+          cd C:\\repo\\VideoRenderer
           (Get-Content .\\platform.props) | ForEach-Object { $_ -replace ">10.0<", ">10.0.22621.0<" } | Set-Content .\\platform.props
 
       - name: Get latest commit SHA for MPC-BE and Prepare Release Notes
         shell: pwsh
         run: |
-          cd D:\\MPC-BE
+          cd C:\\repo\\MPC-BE
           $SHA_MPC_BE = (git rev-parse HEAD)
           echo "SHA_MPC_BE=$SHA_MPC_BE" >> $env:GITHUB_ENV
           echo "What's new for this nightly builds" > "${{ github.workspace }}-nightly_builds_release_notes.txt"
@@ -110,7 +110,7 @@ jobs:
       - name: Get latest commit SHA for VideoRenderer and Prepare Release Notes
         shell: pwsh
         run: |
-          cd D:\\VideoRenderer
+          cd C:\\repo\\VideoRenderer
           $SHA_VIDEORENDERER = (git rev-parse HEAD)
           echo "SHA_VIDEORENDERER=$SHA_VIDEORENDERER" >> $env:GITHUB_ENV
           echo "https://github.com/Aleksoid1978/VideoRenderer/commits/$SHA_VIDEORENDERER" >> "${{ github.workspace }}-nightly_builds_release_notes.txt"
@@ -120,38 +120,38 @@ jobs:
       - name: Install InnoSetup
         shell: pwsh
         run: |
-          Invoke-WebRequest -Uri https://jrsoftware.org/download.php/is.exe -OutFile D:\\is.exe
-          Start-Process -FilePath D:\\is.exe -ArgumentList "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/SP-" -Wait
+          Invoke-WebRequest -Uri https://jrsoftware.org/download.php/is.exe -OutFile C:\\repo\\is.exe
+          Start-Process -FilePath C:\\repo\\is.exe -ArgumentList "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/SP-" -Wait
 
       - name: Set up MSYS
         shell: pwsh
         run: |
           curl -sSL https://raw.githubusercontent.com/Aleksoid1978/MSYS/refs/heads/main/MSYS_MinGW-w64_GCC_1421_x86-x64.7z -o MSYS_MinGW-w64_GCC_1421_x86-x64.7z
-          7z x MSYS_MinGW-w64_GCC_1421_x86-x64.7z -oD:\\MSYS
+          7z x MSYS_MinGW-w64_GCC_1421_x86-x64.7z -oC:\\repo\\MSYS
 
       - name: Create environments.bat
         shell: pwsh
         run: |
-          echo '@ECHO OFF' > D:\\MPC-BE\\environments.bat
-          echo 'SET "MPCBE_MSYS=D:\\MSYS"' >> D:\\MPC-BE\\environments.bat
-          echo 'SET "MPCBE_MINGW=D:\\MSYS\\mingw"' >> D:\\MPC-BE\\environments.bat
+          echo '@ECHO OFF' > C:\\repo\\MPC-BE\\environments.bat
+          echo 'SET "MPCBE_MSYS=C:\\repo\\MSYS"' >> C:\\repo\\MPC-BE\\environments.bat
+          echo 'SET "MPCBE_MINGW=C:\\repo\\MSYS\\mingw"' >> C:\\repo\\MPC-BE\\environments.bat
 
       - name: Execute update_gcc.bat
         shell: pwsh
         run: |
-          cd D:\\MPC-BE
+          cd C:\\repo\\MPC-BE
           .\\update_gcc.bat
 
       - name: Build VideoRenderer
         shell: pwsh
         run: |
-          cd D:\\VideoRenderer
+          cd C:\\repo\\VideoRenderer
           .\\build_mpcvr.cmd NoWait
 
       - name: Build MPC-BE
         shell: pwsh
         run: |
-          cd D:\\MPC-BE
+          cd C:\\repo\\MPC-BE
           .\\build.bat Clean All NoWait
           .\\build.bat Build All Packages NoWait
 
@@ -159,7 +159,7 @@ jobs:
         uses: actions/upload-artifact@main
         with:
           name: "MPC-BE.LOGS"
-          path: D:/MPC-BE/_bin/logs/
+          path: C:/repo/MPC-BE/_bin/logs/
           compression-level: 9
         continue-on-error: true
 
@@ -167,7 +167,7 @@ jobs:
         uses: actions/upload-artifact@main
         with:
           name: "MPC-VideoRenderer.LOGS"
-          path: D:/VideoRenderer/_bin/logs/
+          path: C:/repo/VideoRenderer/_bin/logs/
           compression-level: 9
         continue-on-error: true
 
@@ -182,6 +182,6 @@ jobs:
         with:
           tag_name: ${{ env.tag }}
           files: |
-            D:/MPC-BE/_bin/Packages/**/*.*
-            D:/VideoRenderer/_bin/MpcVideoRenderer*.zip
+            C:/repo/MPC-BE/_bin/Packages/**/*.*
+            C:/repo/VideoRenderer/_bin/MpcVideoRenderer*.zip
           body_path: ${{ github.workspace }}-nightly_builds_release_notes.txt
